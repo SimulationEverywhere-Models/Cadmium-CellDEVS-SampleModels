@@ -25,11 +25,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CELLDEVS_TUTORIAL_1_SIR_COUPLED_HPP
-#define CELLDEVS_TUTORIAL_1_SIR_COUPLED_HPP
+#ifndef CELLDEVS_TUTORIAL_2_1_AGENT_SIR_COUPLED_HPP
+#define CELLDEVS_TUTORIAL_2_1_AGENT_SIR_COUPLED_HPP
 
 #include <nlohmann/json.hpp>
-#include <cadmium/celldevs/coupled/grid_coupled.hpp>
+#include <cadmium/celldevs/coupled/cells_coupled.hpp>
 #include "state.hpp"
 #include "vicinity.hpp"
 #include "cells/sir_cell.hpp"
@@ -39,27 +39,30 @@
  * @tparam T type used to represent simulation time.
  */
 template <typename T>
-class sir_coupled : public cadmium::celldevs::grid_coupled<T, sir, mc> {
+class sir_coupled : public cadmium::celldevs::cells_coupled<T, std::string, sir, mc> {
 public:
 
-    explicit sir_coupled(std::string const &id) : grid_coupled<T, sir, mc>(id){}
+    explicit sir_coupled(std::string const &id) : cells_coupled<T, std::string, sir, mc>(id){}
 
     /**
-     * We only have to override the add_grid_cell_json method.
+     * We only have to override the add_cell_json method.
      * We have to match a string containing a cell type with the cell class that corresponds to this type.
      * @param cell_type string that tells us which cell type needs to be loaded
-     * @param map information about the scenario (i.e., shape of the scenario, neighbors, vicinity with neighbors...)
-     * @param delay_id string that tells us which delay type (transport, hybrid, or inertial) must implement the cell
+     * @param cell_id ID of the cell that need to be loaded.
+     * @param neighborhood unordered map {neighbor ID: vicinity}
+     * @param initial_state initial state of the cell
+     * @param delay_id delay type of the cell.
      * @param config chunk of JSON file with additional configuration parameters. We won't use this yet.
      */
-    void add_grid_cell_json(std::string const &cell_type, cell_map<sir, mc> &map, std::string const &delay_id,
-                            nlohmann::json const &config) override {
+    void add_cell_json(std::string const &cell_type, std::string const &cell_id,
+                       std::unordered_map<std::string, mc> const &neighborhood,
+                       sir initial_state, std::string const &delay_id, nlohmann::json const &config) override {
         if (cell_type == "sir") {
             // In this first example, we only have one cell type: the sir cell.
             // We only have to call the add_cell method with the corresponding cell type in the template
-            this->template add_cell<sir_cell>(map, delay_id);
+            this->template add_cell<sir_cell>(cell_id, neighborhood, initial_state, delay_id);
         } else throw std::bad_typeid();
     }
 };
 
-#endif //CELLDEVS_TUTORIAL_1_SIR_COUPLED_HPP
+#endif //CELLDEVS_TUTORIAL_2_1_AGENT_SIR_COUPLED_HPP

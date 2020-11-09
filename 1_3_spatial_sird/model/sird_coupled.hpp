@@ -50,7 +50,7 @@ public:
      * @param cell_type string that tells us which cell type needs to be loaded
      * @param map information about the scenario (i.e., shape of the scenario, neighbors, vicinity with neighbors...)
      * @param delay_id string that tells us which delay type (transport, hybrid, or inertial) must implement the cell
-     * @param config chunk of JSON file with additional configuration parameters. We won't use this yet.
+     * @param config chunk of JSON file with additional configuration parameters.
      */
     void add_grid_cell_json(std::string const &cell_type, cell_map<sird, mc> &map, std::string const &delay_id,
                             nlohmann::json const &config) override {

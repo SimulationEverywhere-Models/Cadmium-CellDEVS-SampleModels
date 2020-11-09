@@ -38,13 +38,13 @@ using namespace cadmium::celldevs;
 using TIME = float;
 
 /*************** Loggers *******************/
-static ofstream out_messages("../logs/pandemic_hoya_outputs.txt");
+static ofstream out_messages("../logs/2_1_agent_sir_outputs.txt");
 struct oss_sink_messages{
     static ostream& sink(){
         return out_messages;
     }
 };
-static ofstream out_state("../logs/pandemic_hoya_state.txt");
+static ofstream out_state("../logs/2_1_agent_sir_state.txt");
 struct oss_sink_state{
     static ostream& sink(){
         return out_state;
@@ -66,9 +66,9 @@ int main(int argc, char ** argv) {
         return -1;
     }
 
-    sir_coupled<TIME> test = sir_coupled<TIME>("sir");
+    sir_coupled<TIME> test = sir_coupled<TIME>("agent_sir");
     std::string scenario_config_file_path = argv[1];
-    test.add_lattice_json(scenario_config_file_path);
+    test.add_cells_json(scenario_config_file_path);
     test.couple_cells();
 
     std::shared_ptr<cadmium::dynamic::modeling::coupled<TIME>> t = std::make_shared<sir_coupled<TIME>>(test);

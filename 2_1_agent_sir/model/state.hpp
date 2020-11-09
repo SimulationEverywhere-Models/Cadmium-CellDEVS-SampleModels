@@ -25,8 +25,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CELLDEVS_TUTORIAL_1_SIR_STATE_HPP
-#define CELLDEVS_TUTORIAL_1_SIR_STATE_HPP
+#ifndef CELLDEVS_TUTORIAL_2_1_AGENT_SIR_STATE_HPP
+#define CELLDEVS_TUTORIAL_2_1_AGENT_SIR_STATE_HPP
 
 #include <nlohmann/json.hpp>
 
@@ -79,4 +79,4 @@ std::ostream &operator << (std::ostream &os, const sir &x) {
     j.at("recovered").get_to(s.recovered);
 }
 
-#endif //CELLDEVS_TUTORIAL_1_SIR_STATE_HPP
+#endif //CELLDEVS_TUTORIAL_2_1_AGENT_SIR_STATE_HPP

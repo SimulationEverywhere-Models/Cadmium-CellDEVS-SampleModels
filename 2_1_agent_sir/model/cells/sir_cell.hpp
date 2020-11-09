@@ -25,12 +25,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CELLDEVS_TUTORIAL_1_SIR_SIR_CELL_HPP
-#define CELLDEVS_TUTORIAL_1_SIR_SIR_CELL_HPP
+#ifndef CELLDEVS_TUTORIAL_2_1_AGENT_SIR_SIR_CELL_HPP
+#define CELLDEVS_TUTORIAL_2_1_AGENT_SIR_SIR_CELL_HPP
 
 #include <cmath>
+#include <unordered_map>
 #include <nlohmann/json.hpp>
-#include <cadmium/celldevs/cell/grid_cell.hpp>
+#include <cadmium/celldevs/cell/cell.hpp>
 #include "../state.hpp"
 #include "../vicinity.hpp"
 
@@ -41,23 +42,22 @@ using namespace cadmium::celldevs;
  * @tparam T data type used to represent the simulation time
  */
 template <typename T>
-/// sir_cell inherits the grid_cell class. As specified by the template, cell state uses the sir struct, and vicinities the mc struct
-class [[maybe_unused]] sir_cell : public grid_cell<T, sir, mc> {
+/// sir_cell inherits the cell class. As specified by the template, cell state uses the sir struct, and vicinities the mc struct
+class [[maybe_unused]] sir_cell : public cell<T, std::string, sir, mc> {
 public:
     // We must specify which attributes of the base class we are going to use
-    using grid_cell<T, sir, mc>::simulation_clock;
-    using grid_cell<T, sir, mc>::state;
-    using grid_cell<T, sir, mc>::map;
-    using grid_cell<T, sir, mc>::neighbors;
+    using cell<T, std::string, sir, mc>::simulation_clock;
+    using cell<T, std::string, sir, mc>::state;
+    using cell<T, std::string, sir, mc>::neighbors;
 
     float virulence = 0.6;  /// in this example, virulence is fixed. It is 0.6
     float recovery = 0.4;   /// in this example, recovery rate is fixed. It is 0.4
 
-    sir_cell() : grid_cell<T, sir, mc>() {}
+    sir_cell() : cell<T, sir, mc>() {}
 
-    [[maybe_unused]] sir_cell(cell_position const &cell_id, cell_unordered<mc> const &neighborhood, sir initial_state,
-                              cell_map<sir, mc> const &map_in, std::string const &delay_id) :
-            grid_cell<T, sir, mc>(cell_id, neighborhood, initial_state, map_in, delay_id) {
+    [[maybe_unused]] sir_cell(std::string const &cell_id, std::unordered_map<std::string, mc> const &neighborhood,
+                              sir initial_state, std::string const &delay_id) :
+            cell<T, std::string, sir, mc>(cell_id, neighborhood, initial_state, delay_id) {
     }
 
     /**
@@ -115,4 +115,4 @@ public:
         return c_state.infected * recovery;
     }
 };
-#endif //CELLDEVS_TUTORIAL_1_SIR_SIR_CELL_HPP
+#endif //CELLDEVS_TUTORIAL_2_1_AGENT_SIR_SIR_CELL_HPP
