@@ -17,6 +17,12 @@ find_package(Boost COMPONENTS unit_test_framework system thread REQUIRED)
 
 file(MAKE_DIRECTORY logs)
 
-add_executable(1_sir 1_sir/main.cpp)
+add_executable(1_1_spatial_sir 1_1_spatial_sir/main.cpp)
+add_executable(1_2_spatial_sir_config 1_2_spatial_sir_config/main.cpp)
+add_executable(1_3_spatial_sird 1_3_spatial_sird/main.cpp)
+add_executable(1_4_spatial_sirds 1_4_spatial_sirds/main.cpp)
 
-target_link_libraries(1_sir PUBLIC ${Boost_LIBRARIES})
+target_link_libraries(1_1_spatial_sir PUBLIC ${Boost_LIBRARIES})
+target_link_libraries(1_2_spatial_sir_config  PUBLIC ${Boost_LIBRARIES})
+target_link_libraries(1_3_spatial_sird  PUBLIC ${Boost_LIBRARIES})
+target_link_libraries(1_4_spatial_sirds  PUBLIC ${Boost_LIBRARIES})
