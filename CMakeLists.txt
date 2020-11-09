@@ -23,6 +23,7 @@ add_executable(1_3_spatial_sird 1_3_spatial_sird/main.cpp)
 add_executable(1_4_spatial_sirds 1_4_spatial_sirds/main.cpp)
 
 add_executable(2_1_agent_sir 2_1_agent_sir/main.cpp)
+add_executable(2_2_agent_sir_config 2_2_agent_sir_config/main.cpp)
 
 target_link_libraries(1_1_spatial_sir PUBLIC ${Boost_LIBRARIES})
 target_link_libraries(1_2_spatial_sir_config  PUBLIC ${Boost_LIBRARIES})
@@ -30,3 +31,4 @@ target_link_libraries(1_3_spatial_sird  PUBLIC ${Boost_LIBRARIES})
 target_link_libraries(1_4_spatial_sirds  PUBLIC ${Boost_LIBRARIES})
 
 target_link_libraries(2_1_agent_sir  PUBLIC ${Boost_LIBRARIES})
+target_link_libraries(2_2_agent_sir_config  PUBLIC ${Boost_LIBRARIES})

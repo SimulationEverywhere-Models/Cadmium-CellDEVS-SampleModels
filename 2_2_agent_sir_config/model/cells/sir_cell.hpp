@@ -25,12 +25,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CELLDEVS_TUTORIAL_1_2_SPATIAL_SIR_CONFIG_SIR_CELL_HPP
-#define CELLDEVS_TUTORIAL_1_2_SPATIAL_SIR_CONFIG_SIR_CELL_HPP
+#ifndef CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_SIR_CELL_HPP
+#define CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_SIR_CELL_HPP
 
 #include <cmath>
+#include <unordered_map>
 #include <nlohmann/json.hpp>
-#include <cadmium/celldevs/cell/grid_cell.hpp>
+#include <cadmium/celldevs/cell/cell.hpp>
 #include "../state.hpp"
 #include "../vicinity.hpp"
 
@@ -60,22 +61,21 @@ void from_json(const nlohmann::json& j, sir_cell_config &c) {
  * @tparam T data type used to represent the simulation time
  */
 template <typename T>
-/// sir_cell inherits the grid_cell class. As specified by the template, cell state uses the sir struct, and vicinities the mc struct
-class [[maybe_unused]] sir_cell : public grid_cell<T, sir, mc> {
+/// sir_cell inherits the cell class. As specified by the template, cell state uses the sir struct, and vicinities the mc struct
+class [[maybe_unused]] sir_cell : public cell<T, std::string, sir, mc> {
 public:
     // We must specify which attributes of the base class we are going to use
-    using grid_cell<T, sir, mc>::simulation_clock;
-    using grid_cell<T, sir, mc>::state;
-    using grid_cell<T, sir, mc>::map;
-    using grid_cell<T, sir, mc>::neighbors;
+    using cell<T, std::string, sir, mc>::simulation_clock;
+    using cell<T, std::string, sir, mc>::state;
+    using cell<T, std::string, sir, mc>::neighbors;
 
-    sir_cell_config cell_config;
+    sir_cell_config config;
 
-    sir_cell() : grid_cell<T, sir, mc>() {}
+    sir_cell() : cell<T, sir, mc>() {}
 
-    [[maybe_unused]] sir_cell(cell_position const &cell_id, cell_unordered<mc> const &neighborhood, sir initial_state,
-                                cell_map<sir, mc> const &map_in, std::string const &delay_id, sir_cell_config config) :
-            grid_cell<T, sir, mc>(cell_id, neighborhood, initial_state, map_in, delay_id), cell_config(config) {
+    [[maybe_unused]] sir_cell(std::string const &cell_id, std::unordered_map<std::string, mc> const &neighborhood,
+                              sir initial_state, std::string const &delay_id, sir_cell_config conf) :
+            cell<T, std::string, sir, mc>(cell_id, neighborhood, initial_state, delay_id), config(conf) {
     }
 
     /**
@@ -121,7 +121,7 @@ public:
             mc v = state.neighbors_vicinity.at(neighbor);
             aux += n.infected * (float) n.population * v.mobility * v.connectivity;
         }
-        return std::min(c_state.susceptible, c_state.susceptible * cell_config.virulence * aux / (float) c_state.population);
+        return std::min(c_state.susceptible, c_state.susceptible * config.virulence * aux / (float) c_state.population);
     }
 
     /**
@@ -130,7 +130,7 @@ public:
      * @return percentage of new recoveries
      */
     [[nodiscard]] float new_recoveries(sir const &c_state) const {
-        return c_state.infected * cell_config.recovery;
+        return c_state.infected * config.recovery;
     }
 };
-#endif //CELLDEVS_TUTORIAL_1_2_SPATIAL_SIR_CONFIG_SIR_CELL_HPP
+#endif //CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_SIR_CELL_HPP
