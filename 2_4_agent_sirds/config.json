@@ -2,7 +2,7 @@
   "cells": {
     "default": {
       "delay": "inertial",
-      "cell_type": "sird",
+      "cell_type": "sirds",
       "state": {
         "population": 100,
         "susceptible": 1,
@@ -13,6 +13,7 @@
       "config": {
         "virulence": 0.6,
         "recovery": 0.4,
+        "immunity":0.95,
         "fatality": 0.1
       },
       "neighborhood": {}

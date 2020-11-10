@@ -25,8 +25,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_SIR_CELL_HPP
-#define CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_SIR_CELL_HPP
+#ifndef CELLDEVS_TUTORIAL_2_3_AGENT_SIRD_SIR_CELL_HPP
+#define CELLDEVS_TUTORIAL_2_3_AGENT_SIRD_SIR_CELL_HPP
 
 #include <cmath>
 #include <unordered_map>
@@ -40,9 +40,10 @@ using namespace cadmium::celldevs;
 /**
  * Configuration for basic Susceptible-Infected-Recovered model for Cadmium Cell-DEVS
  */
-struct sir_cell_config {
+struct sird_cell_config {
     float virulence;    /// in this example, virulence is provided using a configuration structure
     float recovery;     /// in this example, recovery is provided using a configuration structure
+    float fatality;     /// in this example, fatality is provided using a configuration structure
 };
 
 /**
@@ -51,9 +52,10 @@ struct sir_cell_config {
  * @param j Chunk of JSON file that represents a cell state
  * @param s cell configuration struct to be filled with the configuration shown in the JSON file.
  */
-void from_json(const nlohmann::json& j, sir_cell_config &c) {
+void from_json(const nlohmann::json& j, sird_cell_config &c) {
     j.at("virulence").get_to(c.virulence);
     j.at("recovery").get_to(c.recovery);
+    j.at("fatality").get_to(c.fatality);
 }
 
 /**
@@ -62,20 +64,20 @@ void from_json(const nlohmann::json& j, sir_cell_config &c) {
  */
 template <typename T>
 /// sir_cell inherits the cell class. As specified by the template, cell state uses the sir struct, and vicinities the mc struct
-class [[maybe_unused]] sir_cell : public cell<T, std::string, sir, mc> {
+class [[maybe_unused]] sird_cell : public cell<T, std::string, sird, mc> {
 public:
     // We must specify which attributes of the base class we are going to use
-    using cell<T, std::string, sir, mc>::simulation_clock;
-    using cell<T, std::string, sir, mc>::state;
-    using cell<T, std::string, sir, mc>::neighbors;
+    using cell<T, std::string, sird, mc>::simulation_clock;
+    using cell<T, std::string, sird, mc>::state;
+    using cell<T, std::string, sird, mc>::neighbors;
 
-    sir_cell_config config;
+    sird_cell_config config;
 
-    sir_cell() : cell<T, sir, mc>() {}
+    sird_cell() : cell<T, sird, mc>() {}
 
-    [[maybe_unused]] sir_cell(std::string const &cell_id, std::unordered_map<std::string, mc> const &neighborhood,
-                              sir initial_state, std::string const &delay_id, sir_cell_config conf) :
-            cell<T, std::string, sir, mc>(cell_id, neighborhood, initial_state, delay_id), config(conf) {
+    [[maybe_unused]] sird_cell(std::string const &cell_id, std::unordered_map<std::string, mc> const &neighborhood,
+                              sird initial_state, std::string const &delay_id, sird_cell_config conf) :
+            cell<T, std::string, sird, mc>(cell_id, neighborhood, initial_state, delay_id), config(conf) {
     }
 
     /**
@@ -87,15 +89,17 @@ public:
      * IMPORTANT: neighbor cells' latest published state MAY NOT BE the neighbor cells' current state.
      * @return the new state that the cell should have
      */
-    [[nodiscard]] sir local_computation() const override {
-        sir res = state.current_state;  // first, we make a copy of the cell's current state and store it in the variable res
+    [[nodiscard]] sird local_computation() const override {
+        sird res = state.current_state;  // first, we make a copy of the cell's current state and store it in the variable res
         float new_i = new_infections(res);  // to compute the percentage of new infections, we implement an auxiliary method.
         float new_r = new_recoveries(res);  // to compute the percentage of new recovered people, we implement an auxiliary method
+        float new_d = new_deceases(res);    // to compute the percentage of new deceased people, we implement an auxiliary method
 
         // We just want two decimals in the percentage -> let's round the current outcome:
+        res.deceased = std::round((res.deceased + new_d) * 100) / 100;
         res.recovered = std::round((res.recovered + new_r) * 100) / 100;
-        res.infected = std::round((res.infected + new_i - new_r) * 100) / 100;
-        res.susceptible = 1 - res.infected - res.recovered;
+        res.infected = std::round((res.infected + new_i - new_r - new_d) * 100) / 100;
+        res.susceptible = 1 - res.infected - res.recovered - res.deceased;
         // We return the new state that the cell should have (remember, it is not yet the cell's state)
         return res;
     }
@@ -105,7 +109,7 @@ public:
      * @param cell_state the new cell state.
      * @return how long the cell will wait before sending the new state to neighboring cells.
      */
-    T output_delay(sir const &cell_state) const override {
+    T output_delay(sird const &cell_state) const override {
         return 1;  // in this example, the delay is always 1 simulation tick.
     }
 
@@ -114,10 +118,10 @@ public:
      * @param c_state current state of the cell
      * @return percentage of new infections
      */
-    [[nodiscard]] float new_infections(sir const &c_state) const {
+    [[nodiscard]] float new_infections(sird const &c_state) const {
         float aux = 0;
         for(auto neighbor: neighbors) {
-            sir n = state.neighbors_state.at(neighbor);
+            sird n = state.neighbors_state.at(neighbor);
             mc v = state.neighbors_vicinity.at(neighbor);
             aux += n.infected * (float) n.population * v.mobility * v.connectivity;
         }
@@ -129,8 +133,17 @@ public:
      * @param c_state current state of the cell
      * @return percentage of new recoveries
      */
-    [[nodiscard]] float new_recoveries(sir const &c_state) const {
+    [[nodiscard]] float new_recoveries(sird const &c_state) const {
         return c_state.infected * config.recovery;
     }
+
+    /**
+     * Auxiliary method to compute the percentage of new deceases. This method MUST be constant. Otherwise, it won't compile
+     * @param c_state current state of the cell
+     * @return percentage of new deceases
+     */
+    [[nodiscard]] float new_deceases(sird const &c_state) const {
+        return c_state.infected * config.fatality;
+    }
 };
-#endif //CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_SIR_CELL_HPP
+#endif //CELLDEVS_TUTORIAL_2_3_AGENT_SIRD_SIR_CELL_HPP

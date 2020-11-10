@@ -25,24 +25,24 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_COUPLED_HPP
-#define CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_COUPLED_HPP
+#ifndef CELLDEVS_TUTORIAL_2_4_AGENT_SIRDS_COUPLED_HPP
+#define CELLDEVS_TUTORIAL_2_4_AGENT_SIRDS_COUPLED_HPP
 
 #include <nlohmann/json.hpp>
 #include <cadmium/celldevs/coupled/cells_coupled.hpp>
 #include "state.hpp"
 #include "vicinity.hpp"
-#include "cells/sir_cell.hpp"
+#include "cells/sirds_cell.hpp"
 
 /**
  * We need to define a grid_coupled class that knows all the different types of cells that the scenario may have.
  * @tparam T type used to represent simulation time.
  */
 template <typename T>
-class sir_coupled : public cadmium::celldevs::cells_coupled<T, std::string, sir, mc> {
+class sirds_coupled : public cadmium::celldevs::cells_coupled<T, std::string, sird, mc> {
 public:
 
-    explicit sir_coupled(std::string const &id) : cells_coupled<T, std::string, sir, mc>(id){}
+    explicit sirds_coupled(std::string const &id) : cells_coupled<T, std::string, sird, mc>(id){}
 
     /**
      * We only have to override the add_cell_json method.
@@ -56,14 +56,14 @@ public:
      */
     void add_cell_json(std::string const &cell_type, std::string const &cell_id,
                        std::unordered_map<std::string, mc> const &neighborhood,
-                       sir initial_state, std::string const &delay_id, nlohmann::json const &config) override {
-        if (cell_type == "sir") {
+                       sird initial_state, std::string const &delay_id, nlohmann::json const &config) override {
+        if (cell_type == "sirds") {
             // In this first example, we only have one cell type: the sir cell.
             // We only have to call the add_cell method with the corresponding cell type in the template
-            auto conf = config.get<sir_cell_config>();
-            this->template add_cell<sir_cell>(cell_id, neighborhood, initial_state, delay_id, conf);
+            auto conf = config.get<sirds_cell_config>();
+            this->template add_cell<sirds_cell>(cell_id, neighborhood, initial_state, delay_id, conf);
         } else throw std::bad_typeid();
     }
 };
 
-#endif //CELLDEVS_TUTORIAL_2_2_AGENT_SIR_CONFIG_COUPLED_HPP
+#endif //CELLDEVS_TUTORIAL_2_4_AGENT_SIRDS_COUPLED_HPP

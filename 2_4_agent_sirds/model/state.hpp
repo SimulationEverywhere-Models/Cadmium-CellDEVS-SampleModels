@@ -25,8 +25,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef CELLDEVS_TUTORIAL_2_3_AGENT_SIRD_STATE_HPP
-#define CELLDEVS_TUTORIAL_2_3_AGENT_SIRD_STATE_HPP
+#ifndef CELLDEVS_TUTORIAL_2_4_AGENT_SIRDS_STATE_HPP
+#define CELLDEVS_TUTORIAL_2_4_AGENT_SIRDS_STATE_HPP
 
 #include <nlohmann/json.hpp>
 
@@ -82,4 +82,4 @@ std::ostream &operator << (std::ostream &os, const sird &x) {
     j.at("deceased").get_to(s.deceased);
 }
 
-#endif //CELLDEVS_TUTORIAL_2_3_AGENT_SIRD_STATE_HPP
+#endif //CELLDEVS_TUTORIAL_2_4_AGENT_SIRDS_STATE_HPP
