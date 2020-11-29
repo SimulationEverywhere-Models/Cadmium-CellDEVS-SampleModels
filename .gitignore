@@ -51,6 +51,7 @@ CMakeScripts
 
 # Build files
 bin/
+build/
 logs/
 
 # MacOS
